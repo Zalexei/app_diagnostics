@@ -1,7 +1,7 @@
-name: android_diagnostics
-description: "Android process exit reasons (ApplicationExitInfo: ANR, crash, OOM, native tombstones) and on-device profiling (ProfilingManager) for Flutter apps."
+name: app_diagnostics
+description: "Why your app's process died, on Android and iOS: ApplicationExitInfo (ANR, OOM, native tombstones), ProfilingManager, and MetricKit crash, hang and exit reports."
 version: 0.1.0
-repository: https://github.com/Zalexei/android_diagnostics
+repository: https://github.com/Zalexei/app_diagnostics
 screenshots:
   - description: Exit reasons shown after a restart
     path: doc/screenshots/exit_reasons.png
@@ -12,7 +12,7 @@ screenshots:
 topics:
   - android
   - crash
-  - anr
+  - ios
   - profiling
   - diagnostics
 
@@ -50,8 +50,10 @@ flutter:
   plugin:
     platforms:
       android:
-        package: io.github.zalexei.android_diagnostics
-        pluginClass: AndroidDiagnosticsPlugin
+        package: io.github.zalexei.app_diagnostics
+        pluginClass: AppDiagnosticsPlugin
+      ios:
+        pluginClass: AppDiagnosticsPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

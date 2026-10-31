@@ -1,11 +1,11 @@
-package io.github.zalexei.android_diagnostics
+package io.github.zalexei.app_diagnostics
 
 import android.content.Context
 import android.os.Build
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 
 /** Bridges ApplicationExitInfo and ProfilingManager to Dart. */
-class AndroidDiagnosticsPlugin : FlutterPlugin {
+class AppDiagnosticsPlugin : FlutterPlugin {
     private var profiler: Profiler? = null
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:android_diagnostics/android_diagnostics.dart';
-import 'package:android_diagnostics/src/messages.g.dart';
+import 'package:app_diagnostics/app_diagnostics.dart';
+import 'package:app_diagnostics/src/messages.g.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Stands in for the generated Pigeon API (and so for the Kotlin side).

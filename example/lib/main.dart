@@ -2,18 +2,25 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:android_diagnostics/android_diagnostics.dart';
+import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'ios_home.dart';
+
 void main() {
   runApp(
-    const MaterialApp(title: 'android_diagnostics', home: DiagnosticsHome()),
+    MaterialApp(
+      title: 'app_diagnostics',
+      home: Platform.isIOS
+          ? const IosDiagnosticsHome()
+          : const DiagnosticsHome(),
+    ),
   );
 }
 
-const _crashLab = MethodChannel('android_diagnostics_example/crash_lab');
+const _crashLab = MethodChannel('app_diagnostics_example/crash_lab');
 
 /// `__android_log_assert` from liblog: writes the abort message and calls
 /// abort(), so the tombstone carries a readable message.
@@ -179,7 +186,7 @@ class _DiagnosticsHomeState extends State<DiagnosticsHome> {
     final support = _support;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('android_diagnostics'),
+        title: const Text('app_diagnostics'),
         actions: [
           IconButton(
             onPressed: _load,

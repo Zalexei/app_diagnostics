@@ -10,11 +10,11 @@ import 'package:pigeon/pigeon.dart';
   PigeonOptions(
     dartOut: 'lib/src/messages.g.dart',
     kotlinOut:
-        'android/src/main/kotlin/io/github/zalexei/android_diagnostics/Messages.g.kt',
+        'android/src/main/kotlin/io/github/zalexei/app_diagnostics/Messages.g.kt',
     kotlinOptions: KotlinOptions(
-      package: 'io.github.zalexei.android_diagnostics',
+      package: 'io.github.zalexei.app_diagnostics',
     ),
-    dartPackageName: 'android_diagnostics',
+    dartPackageName: 'app_diagnostics',
   ),
 )
 /// What the current device supports. Computed from Build.VERSION.

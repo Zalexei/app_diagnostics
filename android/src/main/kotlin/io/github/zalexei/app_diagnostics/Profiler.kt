@@ -1,4 +1,4 @@
-package io.github.zalexei.android_diagnostics
+package io.github.zalexei.app_diagnostics
 
 import android.content.Context
 import android.os.Build

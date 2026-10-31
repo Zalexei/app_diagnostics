@@ -1,4 +1,4 @@
-import 'package:android_diagnostics/android_diagnostics.dart';
+import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'support/proto_writer.dart';
@@ -39,7 +39,7 @@ ProtoWriter abortTombstone() => ProtoWriter()
     .varint(6, 4242)
     .varint(7, 10190)
     .string(8, 'u:r:untrusted_app:s0')
-    .string(9, 'io.github.zalexei.android_diagnostics_example')
+    .string(9, 'io.github.zalexei.app_diagnostics_example')
     .message(
       10,
       ProtoWriter()
@@ -99,7 +99,7 @@ void main() {
       expect(t.pid, 4242);
       expect(t.tid, 4242);
       expect(t.uid, 10190);
-      expect(t.commandLine, ['io.github.zalexei.android_diagnostics_example']);
+      expect(t.commandLine, ['io.github.zalexei.app_diagnostics_example']);
       expect(t.processUptime, const Duration(seconds: 42));
       expect(t.abortMessage, 'crash_lab: native crash from Dart FFI');
       expect(t.causes, ['null pointer dereference']);
@@ -125,7 +125,7 @@ void main() {
       expect(
         text,
         contains(
-          'pid: 4242, tid: 4242, name: main  >>> io.github.zalexei.android_diagnostics_example <<<',
+          'pid: 4242, tid: 4242, name: main  >>> io.github.zalexei.app_diagnostics_example <<<',
         ),
       );
       expect(

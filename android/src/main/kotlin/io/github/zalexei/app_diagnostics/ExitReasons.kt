@@ -1,4 +1,4 @@
-package io.github.zalexei.android_diagnostics
+package io.github.zalexei.app_diagnostics
 
 import android.app.ActivityManager
 import android.app.ApplicationExitInfo
@@ -99,7 +99,7 @@ internal class ExitReasons(private val context: Context) {
 
     private companion object {
         const val TAG = "AndroidDiagnostics"
-        const val PREFS = "io.github.zalexei.android_diagnostics"
+        const val PREFS = "io.github.zalexei.app_diagnostics"
         const val KEY_LAST_SEEN = "last_seen_exit_timestamp"
     }
 }

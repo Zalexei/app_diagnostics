@@ -1,0 +1,28 @@
+PODS:
+  - app_diagnostics (0.1.0):
+    - Flutter
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - app_diagnostics (from `.symlinks/plugins/app_diagnostics/ios`)
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+
+EXTERNAL SOURCES:
+  app_diagnostics:
+    :path: ".symlinks/plugins/app_diagnostics/ios"
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+
+SPEC CHECKSUMS:
+  app_diagnostics: 35f26e428fc315c18f50fb6f35d9bc1914bcc7df
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+
+PODFILE CHECKSUM: 8a422f6ff0246a9a977234cde9a0db49fe5a40c7
+
+COCOAPODS: 1.16.2

@@ -159,7 +159,7 @@ class PigeonAndroidDiagnostics extends AndroidDiagnosticsPlatform {
 class UnsupportedAndroidDiagnostics extends AndroidDiagnosticsPlatform {
   static const _unsupported = ProfilingResult(
     errorCode: -1,
-    errorMessage: 'android_diagnostics works on Android only',
+    errorMessage: 'ProfilingManager is available on Android only',
   );
 
   @override

@@ -8,7 +8,7 @@
 set -euo pipefail
 
 S=$1
-P=io.github.zalexei.android_diagnostics_example
+P=io.github.zalexei.app_diagnostics_example
 UI="$(dirname "$0")/ui.py"
 
 launch() {

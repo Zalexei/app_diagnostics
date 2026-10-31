@@ -10,9 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart' show immutable, protected, visibleForTesting;
 
 Object? _extractReplyValueOrThrow(
-    List<Object?>? replyList,
-    String channelName, {
-    required bool isNullValid,
+  List<Object?>? replyList,
+  String channelName, {
+  required bool isNullValid,
 }) {
   if (replyList == null) {
     throw PlatformException(
@@ -46,8 +46,9 @@ bool _deepEquals(Object? a, Object? b) {
   }
   if (a is List && b is List) {
     return a.length == b.length &&
-        a.indexed
-            .every(((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]));
+        a.indexed.every(
+          ((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]),
+        );
   }
   if (a is Map && b is Map) {
     if (a.length != b.length) {
@@ -96,7 +97,6 @@ int _deepHash(Object? value) {
   return value.hashCode;
 }
 
-
 /// What the current device supports. Computed from Build.VERSION.
 class SupportMessage {
   SupportMessage({
@@ -141,7 +141,8 @@ class SupportMessage {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static SupportMessage decode(Object result) {
     result as List<Object?>;
@@ -166,7 +167,14 @@ class SupportMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(sdkInt, other.sdkInt) && _deepEquals(sdkIntFull, other.sdkIntFull) && _deepEquals(exitReasons, other.exitReasons) && _deepEquals(nativeTombstones, other.nativeTombstones) && _deepEquals(anrInfo, other.anrInfo) && _deepEquals(profiling, other.profiling) && _deepEquals(profilingTriggers, other.profilingTriggers) && _deepEquals(runningTraceSnapshot, other.runningTraceSnapshot);
+    return _deepEquals(sdkInt, other.sdkInt) &&
+        _deepEquals(sdkIntFull, other.sdkIntFull) &&
+        _deepEquals(exitReasons, other.exitReasons) &&
+        _deepEquals(nativeTombstones, other.nativeTombstones) &&
+        _deepEquals(anrInfo, other.anrInfo) &&
+        _deepEquals(profiling, other.profiling) &&
+        _deepEquals(profilingTriggers, other.profilingTriggers) &&
+        _deepEquals(runningTraceSnapshot, other.runningTraceSnapshot);
   }
 
   @override
@@ -191,16 +199,12 @@ class AnrInfoMessage {
   bool userPerceptible;
 
   List<Object?> _toList() {
-    return <Object?>[
-      anrType,
-      anrId,
-      timeoutMillis,
-      userPerceptible,
-    ];
+    return <Object?>[anrType, anrId, timeoutMillis, userPerceptible];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static AnrInfoMessage decode(Object result) {
     result as List<Object?>;
@@ -221,7 +225,10 @@ class AnrInfoMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(anrType, other.anrType) && _deepEquals(anrId, other.anrId) && _deepEquals(timeoutMillis, other.timeoutMillis) && _deepEquals(userPerceptible, other.userPerceptible);
+    return _deepEquals(anrType, other.anrType) &&
+        _deepEquals(anrId, other.anrId) &&
+        _deepEquals(timeoutMillis, other.timeoutMillis) &&
+        _deepEquals(userPerceptible, other.userPerceptible);
   }
 
   @override
@@ -288,7 +295,8 @@ class ExitInfoMessage {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ExitInfoMessage decode(Object result) {
     result as List<Object?>;
@@ -317,7 +325,18 @@ class ExitInfoMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(reason, other.reason) && _deepEquals(status, other.status) && _deepEquals(importance, other.importance) && _deepEquals(timestamp, other.timestamp) && _deepEquals(pid, other.pid) && _deepEquals(processName, other.processName) && _deepEquals(description, other.description) && _deepEquals(pss, other.pss) && _deepEquals(rss, other.rss) && _deepEquals(processStateSummary, other.processStateSummary) && _deepEquals(hasTrace, other.hasTrace) && _deepEquals(anrInfo, other.anrInfo);
+    return _deepEquals(reason, other.reason) &&
+        _deepEquals(status, other.status) &&
+        _deepEquals(importance, other.importance) &&
+        _deepEquals(timestamp, other.timestamp) &&
+        _deepEquals(pid, other.pid) &&
+        _deepEquals(processName, other.processName) &&
+        _deepEquals(description, other.description) &&
+        _deepEquals(pss, other.pss) &&
+        _deepEquals(rss, other.rss) &&
+        _deepEquals(processStateSummary, other.processStateSummary) &&
+        _deepEquals(hasTrace, other.hasTrace) &&
+        _deepEquals(anrInfo, other.anrInfo);
   }
 
   @override
@@ -368,7 +387,8 @@ class ProfilingRequestMessage {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ProfilingRequestMessage decode(Object result) {
     result as List<Object?>;
@@ -393,7 +413,14 @@ class ProfilingRequestMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(type, other.type) && _deepEquals(tag, other.tag) && _deepEquals(durationMs, other.durationMs) && _deepEquals(bufferSizeKb, other.bufferSizeKb) && _deepEquals(samplingFrequencyHz, other.samplingFrequencyHz) && _deepEquals(samplingIntervalBytes, other.samplingIntervalBytes) && _deepEquals(trackJavaAllocations, other.trackJavaAllocations) && _deepEquals(ringBuffer, other.ringBuffer);
+    return _deepEquals(type, other.type) &&
+        _deepEquals(tag, other.tag) &&
+        _deepEquals(durationMs, other.durationMs) &&
+        _deepEquals(bufferSizeKb, other.bufferSizeKb) &&
+        _deepEquals(samplingFrequencyHz, other.samplingFrequencyHz) &&
+        _deepEquals(samplingIntervalBytes, other.samplingIntervalBytes) &&
+        _deepEquals(trackJavaAllocations, other.trackJavaAllocations) &&
+        _deepEquals(ringBuffer, other.ringBuffer);
   }
 
   @override
@@ -422,17 +449,12 @@ class ProfilingResultMessage {
   int triggerType;
 
   List<Object?> _toList() {
-    return <Object?>[
-      errorCode,
-      errorMessage,
-      resultFilePath,
-      tag,
-      triggerType,
-    ];
+    return <Object?>[errorCode, errorMessage, resultFilePath, tag, triggerType];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ProfilingResultMessage decode(Object result) {
     result as List<Object?>;
@@ -454,7 +476,11 @@ class ProfilingResultMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(errorCode, other.errorCode) && _deepEquals(errorMessage, other.errorMessage) && _deepEquals(resultFilePath, other.resultFilePath) && _deepEquals(tag, other.tag) && _deepEquals(triggerType, other.triggerType);
+    return _deepEquals(errorCode, other.errorCode) &&
+        _deepEquals(errorMessage, other.errorMessage) &&
+        _deepEquals(resultFilePath, other.resultFilePath) &&
+        _deepEquals(tag, other.tag) &&
+        _deepEquals(triggerType, other.triggerType);
   }
 
   @override
@@ -473,14 +499,12 @@ class ProfilingTriggerMessage {
   int? rateLimitingPeriodHours;
 
   List<Object?> _toList() {
-    return <Object?>[
-      triggerType,
-      rateLimitingPeriodHours,
-    ];
+    return <Object?>[triggerType, rateLimitingPeriodHours];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ProfilingTriggerMessage decode(Object result) {
     result as List<Object?>;
@@ -499,14 +523,14 @@ class ProfilingTriggerMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(triggerType, other.triggerType) && _deepEquals(rateLimitingPeriodHours, other.rateLimitingPeriodHours);
+    return _deepEquals(triggerType, other.triggerType) &&
+        _deepEquals(rateLimitingPeriodHours, other.rateLimitingPeriodHours);
   }
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
 }
-
 
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
@@ -515,22 +539,22 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is SupportMessage) {
+    } else if (value is SupportMessage) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    }    else if (value is AnrInfoMessage) {
+    } else if (value is AnrInfoMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    }    else if (value is ExitInfoMessage) {
+    } else if (value is ExitInfoMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    }    else if (value is ProfilingRequestMessage) {
+    } else if (value is ProfilingRequestMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    }    else if (value is ProfilingResultMessage) {
+    } else if (value is ProfilingResultMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    }    else if (value is ProfilingTriggerMessage) {
+    } else if (value is ProfilingTriggerMessage) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
     } else {
@@ -559,15 +583,21 @@ class _PigeonCodec extends StandardMessageCodec {
   }
 }
 
-const StandardMethodCodec pigeonMethodCodec = StandardMethodCodec(_PigeonCodec());
+const StandardMethodCodec pigeonMethodCodec = StandardMethodCodec(
+  _PigeonCodec(),
+);
 
 class AndroidDiagnosticsHostApi {
   /// Constructor for [AndroidDiagnosticsHostApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  AndroidDiagnosticsHostApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
-      : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  AndroidDiagnosticsHostApi({
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) : pigeonVar_binaryMessenger = binaryMessenger,
+       pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty
+           ? '.$messageChannelSuffix'
+           : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -575,7 +605,8 @@ class AndroidDiagnosticsHostApi {
   final String pigeonVar_messageChannelSuffix;
 
   Future<SupportMessage> getSupport() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.getSupport$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.getSupport$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -585,37 +616,39 @@ class AndroidDiagnosticsHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as SupportMessage;
   }
 
   /// ActivityManager.getHistoricalProcessExitReasons for this package.
   Future<List<ExitInfoMessage>> getExitReasons(int pid, int maxNum) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.getExitReasons$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.getExitReasons$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[pid, maxNum]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[pid, maxNum],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return (pigeonVar_replyValue! as List<Object?>).cast<ExitInfoMessage>();
   }
 
   /// Records newer than the previous call; the marker is kept in SharedPreferences.
   Future<List<ExitInfoMessage>> takeNewExitReasons() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.takeNewExitReasons$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.takeNewExitReasons$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -625,132 +658,149 @@ class AndroidDiagnosticsHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return (pigeonVar_replyValue! as List<Object?>).cast<ExitInfoMessage>();
   }
 
   /// Bytes of ApplicationExitInfo.getTraceInputStream for the record, or null.
   Future<Uint8List?> getTrace(int pid, int timestamp) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.getTrace$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.getTrace$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[pid, timestamp]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[pid, timestamp],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
     return pigeonVar_replyValue as Uint8List?;
   }
 
   Future<bool> setProcessStateSummary(Uint8List? summary) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.setProcessStateSummary$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.setProcessStateSummary$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[summary]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[summary],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 
-  Future<ProfilingResultMessage> requestProfiling(String requestId, ProfilingRequestMessage request) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.requestProfiling$pigeonVar_messageChannelSuffix';
+  Future<ProfilingResultMessage> requestProfiling(
+    String requestId,
+    ProfilingRequestMessage request,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.requestProfiling$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[requestId, request]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[requestId, request],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as ProfilingResultMessage;
   }
 
   Future<bool> cancelProfiling(String requestId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.cancelProfiling$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.cancelProfiling$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[requestId]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[requestId],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 
   /// Returns the trigger types that were registered (types newer than the
   /// device are skipped).
-  Future<List<int>> addProfilingTriggers(List<ProfilingTriggerMessage> triggers) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.addProfilingTriggers$pigeonVar_messageChannelSuffix';
+  Future<List<int>> addProfilingTriggers(
+    List<ProfilingTriggerMessage> triggers,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.addProfilingTriggers$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[triggers]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[triggers],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return (pigeonVar_replyValue! as List<Object?>).cast<int>();
   }
 
   Future<void> removeProfilingTriggers(List<int> triggerTypes) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.removeProfilingTriggers$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.removeProfilingTriggers$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[triggerTypes]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[triggerTypes],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   Future<void> clearProfilingTriggers() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.clearProfilingTriggers$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.clearProfilingTriggers$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -760,35 +810,37 @@ class AndroidDiagnosticsHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   Future<bool> requestRunningSystemTrace(String? tag) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.requestRunningSystemTrace$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.requestRunningSystemTrace$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[tag]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[tag],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 
   /// Paths of files the system delivered to filesDir/profiling.
   Future<List<String>> listProfilingFiles() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.listProfilingFiles$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.listProfilingFiles$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -798,23 +850,23 @@ class AndroidDiagnosticsHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return (pigeonVar_replyValue! as List<Object?>).cast<String>();
   }
 }
 
-Stream<ProfilingResultMessage> profilingResults( {String instanceName = ''}) {
+Stream<ProfilingResultMessage> profilingResults({String instanceName = ''}) {
   if (instanceName.isNotEmpty) {
     instanceName = '.$instanceName';
   }
-  final EventChannel profilingResultsChannel =
-      EventChannel('dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsEventApi.profilingResults$instanceName', pigeonMethodCodec);
+  final EventChannel profilingResultsChannel = EventChannel(
+    'dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsEventApi.profilingResults$instanceName',
+    pigeonMethodCodec,
+  );
   return profilingResultsChannel.receiveBroadcastStream().map((dynamic event) {
     return event as ProfilingResultMessage;
   });
 }
-    

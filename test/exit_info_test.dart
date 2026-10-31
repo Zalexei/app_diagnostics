@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:android_diagnostics/android_diagnostics.dart';
+import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 ExitInfo exitInfo({

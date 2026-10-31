@@ -1,4 +1,4 @@
-package io.github.zalexei.android_diagnostics_example
+package io.github.zalexei.app_diagnostics_example
 
 import android.os.Handler
 import android.os.Looper
@@ -14,7 +14,7 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "android_diagnostics_example/crash_lab")
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "app_diagnostics_example/crash_lab")
             .setMethodCallHandler { call, result ->
                 val main = Handler(Looper.getMainLooper())
                 when (call.method) {

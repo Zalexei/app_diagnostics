@@ -2,7 +2,7 @@
 // See also: https://pub.dev/packages/pigeon
 @file:Suppress("UNCHECKED_CAST", "ArrayInDataClass")
 
-package io.github.zalexei.android_diagnostics
+package io.github.zalexei.app_diagnostics
 
 import android.util.Log
 import io.flutter.plugin.common.BasicMessageChannel
@@ -642,7 +642,7 @@ interface AndroidDiagnosticsHostApi {
       val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
       val taskQueue = binaryMessenger.makeBackgroundTaskQueue()
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.getSupport$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.getSupport$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
@@ -657,7 +657,7 @@ interface AndroidDiagnosticsHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.getExitReasons$separatedMessageChannelSuffix", codec, taskQueue)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.getExitReasons$separatedMessageChannelSuffix", codec, taskQueue)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -675,7 +675,7 @@ interface AndroidDiagnosticsHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.takeNewExitReasons$separatedMessageChannelSuffix", codec, taskQueue)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.takeNewExitReasons$separatedMessageChannelSuffix", codec, taskQueue)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
@@ -690,7 +690,7 @@ interface AndroidDiagnosticsHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.getTrace$separatedMessageChannelSuffix", codec, taskQueue)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.getTrace$separatedMessageChannelSuffix", codec, taskQueue)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -708,7 +708,7 @@ interface AndroidDiagnosticsHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.setProcessStateSummary$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.setProcessStateSummary$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -725,7 +725,7 @@ interface AndroidDiagnosticsHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.requestProfiling$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.requestProfiling$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -746,7 +746,7 @@ interface AndroidDiagnosticsHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.cancelProfiling$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.cancelProfiling$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -763,7 +763,7 @@ interface AndroidDiagnosticsHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.addProfilingTriggers$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.addProfilingTriggers$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -780,7 +780,7 @@ interface AndroidDiagnosticsHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.removeProfilingTriggers$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.removeProfilingTriggers$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -798,7 +798,7 @@ interface AndroidDiagnosticsHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.clearProfilingTriggers$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.clearProfilingTriggers$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
@@ -814,7 +814,7 @@ interface AndroidDiagnosticsHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.requestRunningSystemTrace$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.requestRunningSystemTrace$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -831,7 +831,7 @@ interface AndroidDiagnosticsHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsHostApi.listProfilingFiles$separatedMessageChannelSuffix", codec, taskQueue)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsHostApi.listProfilingFiles$separatedMessageChannelSuffix", codec, taskQueue)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
@@ -888,7 +888,7 @@ class PigeonEventSink<T>(private val sink: EventChannel.EventSink) {
 abstract class ProfilingResultsStreamHandler : MessagesPigeonEventChannelWrapper<ProfilingResultMessage> {
   companion object {
     fun register(messenger: BinaryMessenger, streamHandler: ProfilingResultsStreamHandler, instanceName: String = "") {
-      var channelName: String = "dev.flutter.pigeon.android_diagnostics.AndroidDiagnosticsEventApi.profilingResults"
+      var channelName: String = "dev.flutter.pigeon.app_diagnostics.AndroidDiagnosticsEventApi.profilingResults"
       if (instanceName.isNotEmpty()) {
         channelName += ".$instanceName"
       }

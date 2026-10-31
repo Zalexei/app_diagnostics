@@ -1,18 +1,32 @@
-/// Why your Android app's process died (ApplicationExitInfo) and on-device
-/// profiling (ProfilingManager). Every call is safe on any Android version
-/// and on other platforms: unsupported features return empty results.
+/// Why your app's process died and what it was doing:
+///
+/// - [AndroidDiagnostics]: ApplicationExitInfo (exit reasons, ANR traces,
+///   native tombstones) and on-device profiling with ProfilingManager.
+/// - [IosDiagnostics]: MetricKit crash, hang, CPU and disk write reports and
+///   daily exit counts.
+///
+/// Every call is safe on any OS version and on any platform: unsupported
+/// features return empty results.
 library;
 
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'src/exit_info.dart';
+import 'src/ios_diagnostics.dart';
 import 'src/platform.dart';
 import 'src/profiling.dart';
 import 'src/support.dart';
 import 'src/tombstone.dart';
 
 export 'src/exit_info.dart';
+export 'src/ios_diagnostics.dart';
+export 'src/ios_platform.dart'
+    show
+        IosDiagnosticsPlatform,
+        PigeonIosDiagnostics,
+        UnsupportedIosDiagnostics;
+export 'src/metrickit.dart';
 export 'src/platform.dart'
     show
         AndroidDiagnosticsPlatform,
@@ -22,6 +36,8 @@ export 'src/profiling.dart';
 export 'src/support.dart';
 export 'src/tombstone.dart' hide hex64;
 
+/// Android process exit reasons and on-device profiling. See
+/// [IosDiagnostics] for iOS.
 abstract final class AndroidDiagnostics {
   static AndroidDiagnosticsPlatform get _platform =>
       AndroidDiagnosticsPlatform.instance;
