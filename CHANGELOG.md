@@ -11,7 +11,8 @@
     system trace requests with early stop; system triggers (API 36+), running
     trace snapshots (API 36.1), a stream of all results, listing of delivered
     files.
-* iOS, `IosDiagnostics` (MetricKit):
+* iOS, `IosDiagnostics` (MetricKit), **beta**: not yet verified with reports
+  from a real device:
   * Crash, hang, CPU exception, disk write exception and slow launch
     diagnostics with call stack trees of any depth, kept on disk until read,
     each with a stable `id` and MetricKit's JSON byte for byte;

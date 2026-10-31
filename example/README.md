@@ -1,5 +1,57 @@
 # app_diagnostics example
 
+## Minimal use
+
+Report why the previous process died, on both platforms:
+
+```dart
+import 'package:app_diagnostics/app_diagnostics.dart';
+import 'package:flutter/widgets.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Android 11+: every death since the previous launch, once.
+  for (final exit in await AndroidDiagnostics.takeNewExitReasons()) {
+    if (exit.isAppProblem) send('android_exit', exit.toJson());
+  }
+
+  // iOS 14+: MetricKit crash and hang reports, once. The stream also fires
+  // right away when unread reports are waiting.
+  IosDiagnostics.reportsArrived.listen((_) async {
+    for (final report in await IosDiagnostics.takeNewDiagnosticReports()) {
+      for (final d in report.diagnostics) {
+        send('ios_diagnostic', {'id': report.id, 'title': d.title});
+      }
+    }
+  });
+
+  // Both: a note that comes back with the next crash report.
+  await AndroidDiagnostics.setProcessStateSummaryText('screen=home');
+  await IosDiagnostics.setProcessStateSummaryText('screen=home');
+
+  runApp(const SizedBox());
+}
+
+void send(String event, Map<String, Object?> data) {
+  // Your analytics or crash reporter.
+}
+```
+
+Profile a slow screen on an Android 15+ device:
+
+```dart
+final session = AndroidDiagnostics.startProfiling(
+  const ProfilingRequest.systemTrace(duration: Duration(seconds: 10)),
+);
+await openSlowScreen();
+await session.stop();
+final result = await session.result;
+print(result.isSuccess ? result.filePath : result.error); // open in ui.perfetto.dev
+```
+
+## The example app
+
 Crash lab and profiling playground for `app_diagnostics`.
 
 ## Android

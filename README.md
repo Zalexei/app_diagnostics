@@ -1,5 +1,8 @@
 # app_diagnostics
 
+[![pub package](https://img.shields.io/pub/v/app_diagnostics.svg)](https://pub.dev/packages/app_diagnostics)
+[![CI](https://github.com/Zalexei/app_diagnostics/actions/workflows/ci.yml/badge.svg)](https://github.com/Zalexei/app_diagnostics/actions/workflows/ci.yml)
+
 Find out **why your Flutter app's process died** and **what it was doing**,
 on Android and iOS, with the systems' own diagnostics:
 
@@ -12,7 +15,7 @@ on Android and iOS, with the systems' own diagnostics:
   Perfetto system traces on request, plus system triggers (Android 16+) that
   capture a profile when an ANR, OOM or kill happens.
 - iOS [MetricKit](https://developer.apple.com/documentation/metrickit)
-  (iOS 14+): crash, hang, CPU and disk write diagnostics with call stacks,
+  (iOS 14+, **beta**): crash, hang, CPU and disk write diagnostics with call stacks,
   slow launch diagnostics, and daily counts of every kind of app exit
   (memory limit, watchdog, crashes, background kills).
 
@@ -53,6 +56,11 @@ Android:
 `AndroidDiagnostics.getSupport()` tells you what the current device offers.
 
 ### iOS
+
+**Beta.** The iOS part builds and runs (checked on an iOS 27 simulator with
+Xcode 27, CocoaPods and Swift Package Manager), but the simulator never
+receives MetricKit reports, so the handling of real device reports has not
+been verified yet. Reports from devices are welcome in the issue tracker.
 
 | Feature | iOS | On older versions |
 |---|---|---|
