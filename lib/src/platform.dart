@@ -148,8 +148,10 @@ class PigeonAndroidDiagnostics extends AndroidDiagnosticsPlatform {
   @override
   Future<List<String>> listProfilingFiles() => _api.listProfilingFiles();
 
+  /// One stream for all listeners: every new EventChannel stream would take
+  /// the channel over from the previous one.
   @override
-  Stream<ProfilingResult> get profilingResults =>
+  late final Stream<ProfilingResult> profilingResults =
       (_results ?? generated.profilingResults()).map(
         profilingResultFromMessage,
       );

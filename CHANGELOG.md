@@ -13,8 +13,10 @@
     files.
 * iOS, `IosDiagnostics` (MetricKit):
   * Crash, hang, CPU exception, disk write exception and slow launch
-    diagnostics with call stack trees, kept on disk until read;
-    `takeNewDiagnosticReports()` with a persisted marker.
+    diagnostics with call stack trees of any depth, kept on disk until read,
+    each with a stable `id` and MetricKit's JSON byte for byte;
+    `takeNewDiagnosticReports()` with a persisted marker; `reportsArrived`
+    also fires on listen when unread reports wait.
   * Daily exit counts (foreground and background) and peak memory.
   * A process state summary that comes back with crashes of the same pid
     (iOS 17+).

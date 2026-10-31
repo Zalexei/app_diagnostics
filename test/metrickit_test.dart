@@ -314,9 +314,74 @@ void main() {
     });
   });
 
+  group('as stored by the Swift side', () {
+    // Trees and raw stay JSON text: Foundation cannot parse deep trees.
+    final deep = thread(true, [for (var i = 0; i < 300; i++) ('App', i)]);
+    const raw =
+        '{"crashDiagnostics" : [ ], "timeStampEnd" : "2026-10-31 16:00:00"}';
+    final stored = jsonEncode({
+      'id': 17,
+      'receivedAt': 1761900000000,
+      'raw': raw,
+      'crashes': [
+        {
+          'signal': 11,
+          'callStackTree': jsonEncode({
+            'callStackPerThread': true,
+            'callStacks': [deep],
+          }),
+        },
+      ],
+    });
+
+    test('decodes trees from JSON text, even 300 frames deep', () {
+      final r = MetricKitDiagnosticReport.fromJson(stored);
+      expect(r.id, 17);
+      expect(
+        r.crashes.single.callStackTree.attributedStack!.frames,
+        hasLength(300),
+      );
+    });
+
+    test('keeps MetricKit JSON byte for byte', () {
+      final r = MetricKitDiagnosticReport.fromJson(stored);
+      expect(r.rawJson, raw);
+      expect(r.raw['timeStampEnd'], '2026-10-31 16:00:00');
+      expect(
+        MetricKitDiagnosticReport(
+          begin: _epoch,
+          end: _epoch,
+          receivedAt: _epoch,
+          rawJson: 'not json',
+        ).raw,
+        isEmpty,
+      );
+    });
+
+    test('absurd values become FormatException, not other errors', () {
+      for (final json in [
+        '{"begin": 1e20}',
+        '{"hangs": [{"hangDurationSec": 1e305}]}',
+        '{"crashes": [{"callStackTree": "[1, 2]"}]}',
+      ]) {
+        expect(
+          () => MetricKitDiagnosticReport.fromJson(json),
+          throwsFormatException,
+          reason: json,
+        );
+      }
+      expect(
+        () => MetricKitMetricReport.fromJson('{"end": 1e20}'),
+        throwsFormatException,
+      );
+    });
+  });
+
   test('report kinds map to the codes of the Swift side', () {
     expect(MetricKitReportKind.diagnostic.code, 0);
     expect(MetricKitReportKind.metric.code, 1);
     expect(MetricKitReportKind.fromCode(7), isNull);
   });
 }
+
+final _epoch = DateTime.fromMillisecondsSinceEpoch(0);

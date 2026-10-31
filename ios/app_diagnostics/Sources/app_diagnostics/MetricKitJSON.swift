@@ -4,7 +4,10 @@ import MetricKit
 /// Turns MetricKit payloads into the JSON that lib/src/metrickit.dart parses.
 /// Values come from the typed properties (durations in seconds, sizes in
 /// bytes); MetricKit's own jsonRepresentation() formats them as localized
-/// strings, so it is only kept as "raw" for uploading as is.
+/// strings, so it is only kept as "raw" for uploading as is. Call stack trees
+/// and "raw" stay JSON text: Foundation refuses JSON nested deeper than 512
+/// levels, which a call stack of ~250 frames already is, and Dart has no such
+/// limit.
 @available(iOS 14.0, *)
 enum MetricKitJSON {
   static func diagnostics(_ p: MXDiagnosticPayload, summary: (Int) -> String?) -> [String: Any] {
@@ -31,24 +34,24 @@ enum MetricKitJSON {
     }
     out["hangs"] = (p.hangDiagnostics ?? []).map { d -> [String: Any] in
       var m = common(d, tree: d.callStackTree, summary: summary)
-      m["hangDurationSec"] = seconds(d.hangDuration)
+      put(&m, "hangDurationSec", seconds(d.hangDuration))
       return m
     }
     out["cpuExceptions"] = (p.cpuExceptionDiagnostics ?? []).map { d -> [String: Any] in
       var m = common(d, tree: d.callStackTree, summary: summary)
-      m["totalCpuTimeSec"] = seconds(d.totalCPUTime)
-      m["totalSampledTimeSec"] = seconds(d.totalSampledTime)
+      put(&m, "totalCpuTimeSec", seconds(d.totalCPUTime))
+      put(&m, "totalSampledTimeSec", seconds(d.totalSampledTime))
       return m
     }
     out["diskWriteExceptions"] = (p.diskWriteExceptionDiagnostics ?? []).map { d -> [String: Any] in
       var m = common(d, tree: d.callStackTree, summary: summary)
-      m["totalWritesBytes"] = d.totalWritesCaused.converted(to: .bytes).value
+      put(&m, "totalWritesBytes", finite(d.totalWritesCaused.converted(to: .bytes).value))
       return m
     }
     if #available(iOS 16.0, *) {
       out["appLaunches"] = (p.appLaunchDiagnostics ?? []).map { d -> [String: Any] in
         var m = common(d, tree: d.callStackTree, summary: summary)
-        m["launchDurationSec"] = seconds(d.launchDuration)
+        put(&m, "launchDurationSec", seconds(d.launchDuration))
         return m
       }
     }
@@ -87,7 +90,7 @@ enum MetricKitJSON {
       ]
     }
     if let memory = p.memoryMetrics {
-      out["peakMemoryBytes"] = memory.peakMemoryUsage.converted(to: .bytes).value
+      put(&out, "peakMemoryBytes", finite(memory.peakMemoryUsage.converted(to: .bytes).value))
     }
     return out
   }
@@ -97,7 +100,7 @@ enum MetricKitJSON {
       "receivedAt": millis(Date()),
       "begin": millis(begin),
       "end": millis(end),
-      "raw": (try? JSONSerialization.jsonObject(with: raw)) ?? [:],
+      "raw": String(decoding: raw, as: UTF8.self),
     ]
   }
 
@@ -105,7 +108,7 @@ enum MetricKitJSON {
     let md = meta(d.metaData, appVersion: d.applicationVersion)
     var m: [String: Any] = [
       "meta": md,
-      "callStackTree": (try? JSONSerialization.jsonObject(with: tree.jsonRepresentation())) ?? [:],
+      "callStackTree": String(decoding: tree.jsonRepresentation(), as: UTF8.self),
     ]
     if let pid = md["pid"] as? Int {
       put(&m, "processStateSummary", summary(pid))
@@ -139,8 +142,13 @@ enum MetricKitJSON {
     if let value { m[key] = value }
   }
 
-  private static func seconds(_ m: Measurement<UnitDuration>) -> Double {
-    m.converted(to: .seconds).value
+  private static func seconds(_ m: Measurement<UnitDuration>) -> Double? {
+    finite(m.converted(to: .seconds).value)
+  }
+
+  /// JSONSerialization raises an uncatchable exception for NaN and infinity.
+  private static func finite(_ value: Double) -> Double? {
+    value.isFinite ? value : nil
   }
 
   private static func millis(_ date: Date) -> Int64 {

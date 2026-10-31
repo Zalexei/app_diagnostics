@@ -89,8 +89,10 @@ class PigeonIosDiagnostics extends IosDiagnosticsPlatform {
   Future<bool> setProcessStateSummary(Uint8List? summary) =>
       _api.setProcessStateSummary(summary);
 
+  /// One stream for all listeners: every new EventChannel stream would take
+  /// the channel over from the previous one.
   @override
-  Stream<MetricKitReportKind> get reportsArrived =>
+  late final Stream<MetricKitReportKind> reportsArrived =
       (_arrivals ?? generated.reportsArrived())
           .map(MetricKitReportKind.fromCode)
           .where((k) => k != null)

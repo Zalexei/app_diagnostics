@@ -474,7 +474,8 @@ class MetricKitDiagnosticReport {
     this.cpuExceptions = const [],
     this.diskWriteExceptions = const [],
     this.appLaunches = const [],
-    this.raw = const {},
+    this.id,
+    this.rawJson = '{}',
   });
 
   /// Parses a report stored by the iOS side of the plugin.
@@ -544,9 +545,12 @@ class MetricKitDiagnosticReport {
             launchDuration: _duration(d['launchDurationSec']),
           ),
         ),
-        raw: (m['raw'] as Map? ?? const {}).cast<String, Object?>(),
+        id: _intOrNull(m['id']),
+        rawJson: _jsonText(m['raw']),
       );
-    } on TypeError catch (e) {
+    } on Error catch (e) {
+      // TypeError, RangeError of an absurd time, StackOverflowError of an
+      // absurdly deep tree, ...: one bad report must not break the others.
       throw FormatException('Malformed MetricKit diagnostic report: $e');
     }
   }
@@ -564,8 +568,15 @@ class MetricKitDiagnosticReport {
   final List<DiskWriteExceptionDiagnostic> diskWriteExceptions;
   final List<AppLaunchDiagnostic> appLaunches;
 
+  /// Sequence number the plugin gave the report when it stored it; grows
+  /// with every report, so it can serve as an upload id.
+  final int? id;
+
   /// MetricKit's own jsonRepresentation(), for uploading as is.
-  final Map<String, Object?> raw;
+  final String rawJson;
+
+  /// [rawJson] decoded; empty if it is not a JSON object.
+  Map<String, Object?> get raw => _decodeRaw(rawJson);
 
   /// Every diagnostic of the report, crashes first.
   List<MetricKitDiagnostic> get diagnostics => [
@@ -575,8 +586,6 @@ class MetricKitDiagnosticReport {
     ...diskWriteExceptions,
     ...appLaunches,
   ];
-
-  String get rawJson => jsonEncode(raw);
 }
 
 /// Exit counts of one day (MXForegroundExitData / MXBackgroundExitData).
@@ -686,7 +695,8 @@ class MetricKitMetricReport {
     this.foregroundExits,
     this.backgroundExits,
     this.peakMemoryBytes,
-    this.raw = const {},
+    this.id,
+    this.rawJson = '{}',
   });
 
   /// Parses a report stored by the iOS side of the plugin.
@@ -714,9 +724,10 @@ class MetricKitMetricReport {
             ? null
             : AppExitCounts.fromJson(bg.cast<String, Object?>()),
         peakMemoryBytes: (m['peakMemoryBytes'] as num?)?.round(),
-        raw: (m['raw'] as Map? ?? const {}).cast<String, Object?>(),
+        id: _intOrNull(m['id']),
+        rawJson: _jsonText(m['raw']),
       );
-    } on TypeError catch (e) {
+    } on Error catch (e) {
       throw FormatException('Malformed MetricKit metric report: $e');
     }
   }
@@ -737,10 +748,14 @@ class MetricKitMetricReport {
   final AppExitCounts? backgroundExits;
   final int? peakMemoryBytes;
 
-  /// MetricKit's own jsonRepresentation().
-  final Map<String, Object?> raw;
+  /// Sequence number the plugin gave the report when it stored it.
+  final int? id;
 
-  String get rawJson => jsonEncode(raw);
+  /// MetricKit's own jsonRepresentation(), for uploading as is.
+  final String rawJson;
+
+  /// [rawJson] decoded; empty if it is not a JSON object.
+  Map<String, Object?> get raw => _decodeRaw(rawJson);
 }
 
 Map<String, Object?> _decodeObject(String json) {
@@ -762,11 +777,29 @@ Duration _duration(Object? seconds) =>
 MetricKitMetadata _meta(Map<String, Object?> d) =>
     MetricKitMetadata.fromJson((d['meta'] as Map? ?? const {}).cast());
 
+/// The Swift side stores trees as JSON text (Foundation cannot parse deep
+/// trees); a decoded object is accepted too.
 CallStackTree _tree(Map<String, Object?> d) {
-  final t = d['callStackTree'] as Map?;
-  return t == null
-      ? CallStackTree.empty
-      : CallStackTree.fromJson(t.cast<String, Object?>());
+  final t = switch (d['callStackTree']) {
+    final String text when text.isNotEmpty => _decodeObject(text),
+    final Map<Object?, Object?> map => map.cast<String, Object?>(),
+    _ => null,
+  };
+  return t == null ? CallStackTree.empty : CallStackTree.fromJson(t);
+}
+
+String _jsonText(Object? raw) => switch (raw) {
+  final String text => text,
+  null => '{}',
+  _ => jsonEncode(raw),
+};
+
+Map<String, Object?> _decodeRaw(String text) {
+  try {
+    return _decodeObject(text);
+  } on FormatException {
+    return const {};
+  }
 }
 
 Uint8List? _summary(Map<String, Object?> d) {

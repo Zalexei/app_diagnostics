@@ -6,8 +6,9 @@ import MetricKit
 /// registers and stores every payload as JSON (see MetricKitJSON).
 ///
 /// Layout under Application Support/app_diagnostics (excluded from backups):
-/// reports/<seq>-<d|m>.json, state.json (next seq, last returned seq per kind),
-/// summaries.json (process state summaries of recent pids).
+/// reports/<seq>-<d|m>.json (the seq is also the report's "id"), state.json
+/// (next seq, last returned seq per kind), summaries.json (process state
+/// summaries of recent pids).
 final class MetricKitStore {
   static let shared = MetricKitStore()
   static let reportsArrived = Notification.Name("io.github.zalexei.app_diagnostics.reportsArrived")
@@ -23,7 +24,16 @@ final class MetricKitStore {
 
   private struct State: Codable {
     var nextSeq = 1
-    var lastTaken = [0, 0]
+    var lastDiagnostic = 0
+    var lastMetric = 0
+
+    func lastTaken(_ kind: Kind) -> Int {
+      kind == .diagnostic ? lastDiagnostic : lastMetric
+    }
+
+    mutating func setLastTaken(_ kind: Kind, _ seq: Int) {
+      if kind == .diagnostic { lastDiagnostic = seq } else { lastMetric = seq }
+    }
   }
 
   private struct Summary: Codable {
@@ -31,7 +41,7 @@ final class MetricKitStore {
     var base64: String
   }
 
-  private static let maxSummaries = 20
+  private static let maxSummaries = 50
 
   private let queue = DispatchQueue(label: "io.github.zalexei.app_diagnostics.store")
   private let root: URL
@@ -58,15 +68,29 @@ final class MetricKitStore {
   }
 
   func save(_ report: [String: Any], kind: Kind) {
-    guard let data = try? JSONSerialization.data(withJSONObject: report) else { return }
     let saved: Bool = queue.sync {
       ensureRoot()
       var state = loadState()
       // Never reuse a number, even if state.json was lost.
       let newest = (files(.diagnostic) + files(.metric)).map(\.seq).max() ?? 0
       let seq = max(state.nextSeq, newest + 1)
+      var document = report
+      document["id"] = seq
+      // data(withJSONObject:) raises an uncatchable exception for invalid input.
+      guard JSONSerialization.isValidJSONObject(document),
+        let data = try? JSONSerialization.data(withJSONObject: document)
+      else {
+        NSLog("app_diagnostics: dropping a MetricKit report that is not valid JSON")
+        return false
+      }
       let url = reportsDir.appendingPathComponent("\(seq)-\(kind.suffix).json")
-      guard (try? data.write(to: url, options: .atomic)) != nil else { return false }
+      do {
+        try data.write(to: url, options: .atomic)
+      } catch {
+        // For example before the first unlock after a reboot (file protection).
+        NSLog("app_diagnostics: cannot store a MetricKit report: \(error)")
+        return false
+      }
       state.nextSeq = seq + 1
       save(state)
       for old in files(kind).dropLast(kind.limit) {
@@ -81,16 +105,33 @@ final class MetricKitStore {
   }
 
   /// Stored reports of [kind], oldest first. With [onlyNew], skips reports an
-  /// earlier call already returned and moves the marker.
+  /// earlier call already returned and moves the marker past the ones read.
   func reports(_ kind: Kind, onlyNew: Bool) -> [String] {
     queue.sync {
       var state = loadState()
-      let selected = files(kind).filter { !onlyNew || $0.seq > state.lastTaken[kind.rawValue] }
-      if onlyNew, let last = selected.last {
-        state.lastTaken[kind.rawValue] = last.seq
+      var out: [String] = []
+      var lastRead: Int?
+      for file in files(kind) where !onlyNew || file.seq > state.lastTaken(kind) {
+        do {
+          out.append(try String(contentsOf: file.url, encoding: .utf8))
+          lastRead = file.seq
+        } catch {
+          NSLog("app_diagnostics: cannot read \(file.url.lastPathComponent): \(error)")
+        }
+      }
+      if onlyNew, let lastRead {
+        state.setLastTaken(kind, lastRead)
         save(state)
       }
-      return selected.compactMap { try? String(contentsOf: $0.url, encoding: .utf8) }
+      return out
+    }
+  }
+
+  /// Whether [kind] has reports that takeNew has not returned yet.
+  func hasNew(_ kind: Kind) -> Bool {
+    queue.sync {
+      guard let newest = files(kind).last?.seq else { return false }
+      return newest > loadState().lastTaken(kind)
     }
   }
 

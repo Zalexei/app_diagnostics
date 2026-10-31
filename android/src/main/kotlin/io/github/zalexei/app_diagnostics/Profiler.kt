@@ -39,23 +39,38 @@ internal class Profiler(private val context: Context) {
             return
         }
         val signal = CancellationSignal()
+        // Pigeon does not catch exceptions of async handlers and a second reply
+        // throws: answer exactly once, or Dart waits forever.
+        var answered = false
+        val answer = { result: ProfilingResultMessage ->
+            if (!answered) {
+                answered = true
+                if (pending[requestId] === signal) pending.remove(requestId)
+                onResult(result)
+            }
+        }
         val request = try {
             Api35.buildRequest(message, signal)
         } catch (e: IllegalArgumentException) {
-            onResult(failure(ERROR_FAILED_INVALID_REQUEST, e.message, message.tag))
+            answer(failure(ERROR_FAILED_INVALID_REQUEST, e.message, message.tag))
+            return
+        } catch (e: Exception) {
+            answer(failure(ERROR_UNKNOWN, e.toString(), message.tag))
+            return
+        } catch (e: LinkageError) {
+            answer(failure(ERROR_UNKNOWN, e.toString(), message.tag))
             return
         }
         pending[requestId] = signal
         try {
-            Api35.request(context, request, mainExecutor) { result ->
-                pending.remove(requestId)
-                onResult(result)
-            }
-        } catch (e: RuntimeException) {
-            // Pigeon does not catch exceptions of async handlers: answer, or Dart waits forever.
+            Api35.request(context, request, mainExecutor, answer)
+        } catch (e: Exception) {
             Log.w(TAG, "requestProfiling failed", e)
-            pending.remove(requestId)
-            onResult(failure(ERROR_UNKNOWN, e.toString(), message.tag))
+            answer(failure(ERROR_UNKNOWN, e.toString(), message.tag))
+        } catch (e: LinkageError) {
+            // A ProfilingManager trimmed by the device maker.
+            Log.w(TAG, "requestProfiling unavailable", e)
+            answer(failure(ERROR_UNKNOWN, e.toString(), message.tag))
         }
     }
 

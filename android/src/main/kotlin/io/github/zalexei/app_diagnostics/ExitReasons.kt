@@ -24,8 +24,11 @@ internal class ExitReasons(private val context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return emptyList()
         val lastSeen = prefs.getLong(KEY_LAST_SEEN, 0L)
         val fresh = records(0, 0).filter { it.timestamp > lastSeen }
-        fresh.maxOfOrNull { it.timestamp }?.let { prefs.edit().putLong(KEY_LAST_SEEN, it).apply() }
-        return fresh.map { it.toMessage() }
+        val messages = fresh.map { it.toMessage() }
+        // Move the marker only once the records are ready, and synchronously
+        // (this runs on a background queue) so a crash right after keeps it.
+        fresh.maxOfOrNull { it.timestamp }?.let { prefs.edit().putLong(KEY_LAST_SEEN, it).commit() }
+        return messages
     }
 
     fun trace(pid: Int, timestamp: Long): ByteArray? {
@@ -91,7 +94,8 @@ internal class ExitReasons(private val context: Context) {
                 timeoutMillis = call("getTimeoutMillis") as Long,
                 userPerceptible = call("isUserPerceptible") as Boolean,
             )
-        } catch (e: ReflectiveOperationException) {
+        } catch (e: Exception) {
+            // Reflection failures, or unexpected types on an OEM build.
             Log.w(TAG, "getAnrInfo unavailable", e)
             null
         }

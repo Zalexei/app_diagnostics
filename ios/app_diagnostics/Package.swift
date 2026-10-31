@@ -10,11 +10,15 @@ let package = Package(
   products: [
     .library(name: "app-diagnostics", targets: ["app_diagnostics"])
   ],
-  dependencies: [],
+  dependencies: [
+    .package(name: "FlutterFramework", path: "../FlutterFramework")
+  ],
   targets: [
     .target(
       name: "app_diagnostics",
-      dependencies: [],
+      dependencies: [
+        .product(name: "FlutterFramework", package: "FlutterFramework")
+      ],
       resources: [
         .process("PrivacyInfo.xcprivacy")
       ]

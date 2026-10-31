@@ -56,7 +56,8 @@ public class AppDiagnosticsPlugin: NSObject, FlutterPlugin, IosDiagnosticsHostAp
   }
 }
 
-/// Tells Dart the kind of every report stored while it listens.
+/// Tells Dart the kind of every report stored while it listens, and on
+/// listen the kinds that already have reports takeNew has not returned.
 private final class ReportsStream: ReportsArrivedStreamHandler {
   private var observer: NSObjectProtocol?
 
@@ -66,6 +67,9 @@ private final class ReportsStream: ReportsArrivedStreamHandler {
       forName: MetricKitStore.reportsArrived, object: nil, queue: .main
     ) { note in
       if let kind = note.userInfo?["kind"] as? Int { sink.success(Int64(kind)) }
+    }
+    for kind in [MetricKitStore.Kind.diagnostic, .metric] where MetricKitStore.shared.hasNew(kind) {
+      sink.success(Int64(kind.rawValue))
     }
   }
 

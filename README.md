@@ -21,9 +21,11 @@ kills it from the outside: the low memory killer, ANRs dismissed by the user,
 "Force stop", the iOS watchdog, a native crash in a plugin. The next launch
 can read all of that here.
 
-`AndroidDiagnostics` and `IosDiagnostics` are safe to call anywhere: on old
-OS versions and on other platforms unsupported features return empty lists,
-`null`, `false` or `ProfilingError.unsupported` instead of throwing.
+`AndroidDiagnostics` and `IosDiagnostics` are safe to call on any OS version
+and any platform: unsupported features return empty lists, `null`, `false` or
+`ProfilingError.unsupported` instead of throwing. Like any plugin, they need
+`WidgetsFlutterBinding.ensureInitialized()` before the first call when you
+call them from `main`.
 
 Android:
 
@@ -75,7 +77,9 @@ dependencies:
 
 Requirements: Flutter 3.35+. Android: app `compileSdk` 35+ (the plugin uses
 `androidx.core:core:1.15.0`), `minSdk` 24. iOS: deployment target 13+
-(MetricKit reports from iOS 14). No permissions or Info.plist keys needed.
+(MetricKit reports from iOS 14); the plugin builds with CocoaPods and with
+Swift Package Manager (on by default since Flutter 3.47 and tested there).
+No permissions or Info.plist keys needed.
 The iOS part ships a privacy manifest: it uses no required-reason APIs and
 sends nothing anywhere; if you upload reports, declare crash data in your app's
 privacy details.
@@ -203,8 +207,9 @@ await AndroidDiagnostics.requestRunningSystemTrace(tag: 'slow-scroll');
 
 Results of a trigger that fired while the process was dying (OOM, kills)
 arrive in the **next** process, as soon as it listens to `profilingResults`.
-Subscribe early (e.g. in `main`). Files delivered while nobody listened are
-still in `listProfilingFiles()`.
+Subscribe early (e.g. in `main`); delivered files stay in the app's
+`files/profiling` folder, so `listProfilingFiles()` also finds those of an
+earlier launch.
 
 The OOM trigger needs any custom `Thread.UncaughtExceptionHandler` to call
 through to the default one.
@@ -215,7 +220,9 @@ through to the default one.
 
 MetricKit hands each report over once, often before Dart runs. The plugin
 subscribes when the app starts and keeps reports on disk (the latest 50
-diagnostic and 30 daily metric reports) until you read them:
+diagnostic and 30 daily metric reports). `takeNew...` returns each report
+once, so store or upload it before relying on it; `get...` returns all kept
+reports, and `report.id` identifies a report across calls.
 
 ```dart
 Future<void> reportIosDiagnostics() async {
@@ -231,9 +238,9 @@ Future<void> reportIosDiagnostics() async {
   }
 }
 
-// On startup, and again whenever a report arrives (on iOS 15+ diagnostics
-// usually come a few seconds after launch).
-await reportIosDiagnostics();
+// Listen first: the stream also fires right away when unread reports are
+// waiting, and again whenever one arrives (on iOS 15+ diagnostics usually
+// come a few seconds after launch).
 IosDiagnostics.reportsArrived.listen((_) => reportIosDiagnostics());
 ```
 
@@ -251,10 +258,11 @@ print(crash.callStackTree.toText());
 // 1   App                          0x0000000104c1d000 App + 2214400
 ```
 
-Frames are unsymbolicated, like in MetricKit: symbolicate native frames with
-the dSYM of `binaryUuid`, Dart frames (binary `App`) with
-`flutter symbolize` for apps built with `--split-debug-info`.
-`report.rawJson` is MetricKit's own JSON, ready to upload as is.
+Frames are unsymbolicated, like in MetricKit: symbolicate them with the dSYM
+whose UUID is `binaryUuid` (`atos -o <dSYM> -l <load address> <address>`);
+Dart code is in the `App` binary. `report.rawJson` is MetricKit's own JSON,
+byte for byte, ready to upload as is. For a thread stack the plugin takes the
+root frame as frame 0 (the crash site), as MetricKit lists it.
 
 ### Daily exit counts
 
@@ -340,6 +348,10 @@ covered by Dart tests.
   differs from the input dispatch timeout shown in `description`.
 - iOS reports live in `Application Support/app_diagnostics`, excluded from
   backups. `IosDiagnostics.clearReports()` deletes them.
+- Apple deprecates `MXMetricManager` and the `MX*` payload classes in the
+  iOS 27.2 SDK in favor of the new `MetricManager` (iOS 27+). The plugin still
+  uses the `MX*` API, which works on every iOS version from 14; with the 27.2
+  SDK this means deprecation warnings, not errors.
 - The Android part compiles against API 36 and reaches the newer API 36.1 / 37
   methods (`requestRunningSystemTrace`, `getAnrInfo`) through reflection,
   guarded by `Build.VERSION.SDK_INT_FULL`.
