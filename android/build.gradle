@@ -1,5 +1,5 @@
 group = "io.github.zalexei.app_diagnostics"
-version = "0.1.0"
+version = "0.1.1"
 
 buildscript {
     ext.kotlin_version = "2.1.0"
@@ -22,13 +22,35 @@ allprojects {
 }
 
 apply plugin: "com.android.library"
-apply plugin: "kotlin-android"
 
-// Task-level compilerOptions work with Kotlin Gradle plugin 1.8 through 2.x;
-// the kotlinOptions block is an error since 2.2.
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+// Kotlin. With AGP 9+ and built-in Kotlin (android.builtInKotlin not set to
+// false) AGP compiles Kotlin itself and a plugin must not apply the Kotlin
+// Gradle Plugin (KGP). Everywhere else KGP is needed, and Flutter before 3.44
+// does not add it to plugins, so the plugin applies it there. This mirrors
+// isBuiltInKotlinEnabled in Flutter's Gradle plugin. KGP is applied with
+// pluginManager and not with "apply plugin:" on purpose: Flutter 3.44+ scans
+// this file for that line and warns that the plugin needs migrating to
+// built-in Kotlin.
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize(".")[0].toInteger()
+def builtInKotlinProperty = providers.gradleProperty("android.builtInKotlin").getOrNull()
+def builtInKotlin = agpMajor >= 9 && (builtInKotlinProperty == null || builtInKotlinProperty.toBoolean())
+if (!builtInKotlin) {
+    pluginManager.apply("kotlin-android")
+}
+
+if (builtInKotlin) {
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+        }
+    }
+} else {
+    // Task-level compilerOptions work with Kotlin Gradle plugin 1.8 through
+    // 2.x; the kotlinOptions block is an error since 2.2.
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        }
     }
 }
 

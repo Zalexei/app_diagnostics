@@ -1,3 +1,11 @@
+## 0.1.1
+
+* Android: on Flutter 3.44+ apps no longer warn that app_diagnostics applies
+  the Kotlin Gradle Plugin. With AGP 9 and built-in Kotlin the plugin lets
+  AGP compile Kotlin; elsewhere it applies KGP as before. Flutter 3.35+ is
+  still supported.
+* Example builds on Flutter 3.50 (Gradle 9.5, AGP 9.3.1, Kotlin 2.4.20).
+
 ## 0.1.0
 
 * First release.

@@ -1,6 +1,6 @@
 name: app_diagnostics
 description: "Why your app's process died, on Android and iOS: ApplicationExitInfo (ANR, OOM, native tombstones), ProfilingManager, and MetricKit crash, hang and exit reports."
-version: 0.1.0
+version: 0.1.1
 repository: https://github.com/Zalexei/app_diagnostics
 screenshots:
   - description: Exit reasons shown after a restart

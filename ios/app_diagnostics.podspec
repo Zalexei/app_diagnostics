@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'app_diagnostics'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'MetricKit crash, hang and exit diagnostics for Flutter.'
   s.description      = <<-DESC
 iOS side of app_diagnostics: stores MetricKit diagnostic and metric payloads

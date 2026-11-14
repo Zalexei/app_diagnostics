@@ -27,8 +27,39 @@ jobs:
       - run: flutter test
       - run: flutter pub publish --dry-run
 
+  android-app:
+    name: Android app build (Flutter ${{ matrix.flutter }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flutter: ['3.35.0', '3.x']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter }}
+          channel: stable
+          cache: true
+      - name: Build a new app that uses the plugin
+        shell: bash
+        run: |
+          set -eo pipefail
+          flutter create --platforms=android --project-name=plugin_user "$RUNNER_TEMP/app"
+          cd "$RUNNER_TEMP/app"
+          perl -0pi -e "s|\ndependencies:\n|\ndependencies:\n  app_diagnostics:\n    path: $GITHUB_WORKSPACE\n|" pubspec.yaml
+          flutter pub get
+          grep -q '"app_diagnostics"' .flutter-plugins-dependencies
+          flutter build apk --release 2>&1 | tee build.log
+          # Flutter 3.44+ warns about plugins that still apply KGP the old way.
+          ! grep -q 'apply Kotlin Gradle Plugin' build.log
+
   android:
-    name: Android build and Kotlin tests
+    name: Example build and Kotlin tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +70,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.35.0'
           cache: true
       - run: flutter build apk --debug
         working-directory: example
