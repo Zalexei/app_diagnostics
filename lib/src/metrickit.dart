@@ -6,6 +6,7 @@ import 'package:meta/meta.dart';
 /// What MetricKit offers on the current iOS device.
 @immutable
 class MetricKitSupport {
+  /// Creates a description of MetricKit support.
   const MetricKitSupport({
     required this.systemVersion,
     required this.isSimulator,
@@ -62,8 +63,10 @@ enum MetricKitReportKind {
 
   const MetricKitReportKind(this.code);
 
+  /// The numeric code of this kind.
   final int code;
 
+  /// Returns the kind with the given [code], or null if there is none.
   static MetricKitReportKind? fromCode(int code) {
     for (final k in values) {
       if (k.code == code) return k;
@@ -75,6 +78,7 @@ enum MetricKitReportKind {
 /// Device and app details MetricKit attaches to a report (MXMetaData).
 @immutable
 class MetricKitMetadata {
+  /// Creates metadata from its individual values.
   const MetricKitMetadata({
     this.appVersion,
     this.appBuildVersion,
@@ -88,6 +92,7 @@ class MetricKitMetadata {
     this.bundleIdentifier,
   });
 
+  /// Parses metadata from a JSON map; absent or mistyped values become null.
   factory MetricKitMetadata.fromJson(Map<String, Object?> json) =>
       MetricKitMetadata(
         appVersion: json['appVersion'] as String?,
@@ -104,6 +109,8 @@ class MetricKitMetadata {
 
   /// CFBundleShortVersionString of the app that produced the report.
   final String? appVersion;
+
+  /// CFBundleVersion of the app that produced the report.
   final String? appBuildVersion;
 
   /// For example `iPhone OS 18.2 (22C152)`.
@@ -111,7 +118,11 @@ class MetricKitMetadata {
 
   /// Hardware model, for example `iPhone17,1`.
   final String? deviceType;
+
+  /// CPU architecture of the device, for example `arm64e`.
   final String? platformArchitecture;
+
+  /// Region format setting of the device.
   final String? regionFormat;
 
   /// iOS 17+.
@@ -126,6 +137,7 @@ class MetricKitMetadata {
   /// iOS 26+.
   final String? bundleIdentifier;
 
+  /// Converts this metadata to a JSON map, omitting null values.
   Map<String, Object?> toJson() => {
     'appVersion': appVersion,
     'appBuildVersion': appBuildVersion,
@@ -146,6 +158,7 @@ class MetricKitMetadata {
 /// app built with `--split-debug-info`.
 @immutable
 class CallStackFrame {
+  /// Creates a frame from its individual values.
   const CallStackFrame({
     required this.binaryName,
     required this.binaryUuid,
@@ -155,6 +168,7 @@ class CallStackFrame {
     this.subFrames = const [],
   });
 
+  /// Parses a frame and its [subFrames] from a JSON map of MXCallStackTree.
   factory CallStackFrame.fromJson(Map<String, Object?> json) => CallStackFrame(
     binaryName: json['binaryName'] as String? ?? '???',
     binaryUuid: json['binaryUUID'] as String? ?? '',
@@ -168,14 +182,24 @@ class CallStackFrame {
     ],
   );
 
+  /// Name of the binary that contains the frame, `???` if unknown.
   final String binaryName;
+
+  /// UUID of the binary, used to find its dSYM; empty if unknown.
   final String binaryUuid;
+
+  /// Unsymbolicated address of the frame.
   final int address;
+
+  /// Offset of [address] from the start of the binary's text segment.
   final int offsetIntoBinaryTextSegment;
 
   /// How many samples hit this frame (sampled trees of CPU and disk write
   /// exceptions); 1 for crash stacks.
   final int sampleCount;
+
+  /// Frames called from this one: one for thread stacks, any number for
+  /// sampled trees.
   final List<CallStackFrame> subFrames;
 
   /// `index  binary  0xaddress  binary + offset`, the layout of an Apple
@@ -190,8 +214,10 @@ class CallStackFrame {
 /// sampled tree of a CPU or disk write exception.
 @immutable
 class CallStack {
+  /// Creates a stack from its individual values.
   const CallStack({required this.threadAttributed, required this.rootFrames});
 
+  /// Parses a stack from a JSON map of MXCallStackTree.
   factory CallStack.fromJson(Map<String, Object?> json) => CallStack(
     threadAttributed: json['threadAttributed'] as bool? ?? false,
     rootFrames: [
@@ -202,6 +228,8 @@ class CallStack {
 
   /// The thread MetricKit blames: the crashed or the hung one.
   final bool threadAttributed;
+
+  /// Top-level frames of the stack; see [frames] for a thread stack.
   final List<CallStackFrame> rootFrames;
 
   /// The frames of a thread stack in MetricKit's order (frame 0 first), each
@@ -221,11 +249,13 @@ class CallStack {
 /// tree of CPU and disk write exceptions.
 @immutable
 class CallStackTree {
+  /// Creates a tree from its individual values.
   const CallStackTree({
     required this.callStackPerThread,
     required this.callStacks,
   });
 
+  /// Parses a tree from the JSON representation of MXCallStackTree.
   factory CallStackTree.fromJson(Map<String, Object?> json) => CallStackTree(
     callStackPerThread: json['callStackPerThread'] as bool? ?? false,
     callStacks: [
@@ -234,13 +264,17 @@ class CallStackTree {
     ],
   );
 
+  /// A tree without stacks, used when a diagnostic has none.
   static const empty = CallStackTree(callStackPerThread: true, callStacks: []);
 
   /// True for crashes and hangs (one stack per thread), false for sampled
   /// trees.
   final bool callStackPerThread;
+
+  /// The stacks of the tree.
   final List<CallStack> callStacks;
 
+  /// The stack of the thread MetricKit blames, or null if none is marked.
   CallStack? get attributedStack {
     for (final s in callStacks) {
       if (s.threadAttributed) return s;
@@ -288,6 +322,7 @@ class CallStackTree {
 /// Details of an uncaught Objective-C exception (iOS 17+).
 @immutable
 class ObjCExceptionReason {
+  /// Creates an exception reason from its individual values.
   const ObjCExceptionReason({
     required this.composedMessage,
     required this.formatString,
@@ -297,6 +332,7 @@ class ObjCExceptionReason {
     required this.exceptionName,
   });
 
+  /// Parses an exception reason from a JSON map; absent values become empty.
   factory ObjCExceptionReason.fromJson(Map<String, Object?> json) =>
       ObjCExceptionReason(
         composedMessage: json['composedMessage'] as String? ?? '',
@@ -311,8 +347,15 @@ class ObjCExceptionReason {
 
   /// The exception reason with its arguments filled in.
   final String composedMessage;
+
+  /// The format string of the exception reason, before [arguments] are
+  /// filled in.
   final String formatString;
+
+  /// The arguments of [formatString].
   final List<String> arguments;
+
+  /// The type of the exception as MetricKit reports it.
   final String exceptionType;
 
   /// Class of the exception object, for example `NSException`.
@@ -333,13 +376,17 @@ sealed class MetricKitDiagnostic {
     this.processStateSummary,
   });
 
+  /// Device and app details of the process the diagnostic is about.
   final MetricKitMetadata metadata;
+
+  /// Call stacks of the diagnostic; [CallStackTree.empty] if it has none.
   final CallStackTree callStackTree;
 
   /// What the process stored with `IosDiagnostics.setProcessStateSummary`,
   /// matched by [MetricKitMetadata.pid] (iOS 17+); null otherwise.
   final Uint8List? processStateSummary;
 
+  /// [processStateSummary] decoded as UTF-8, or null if there is none.
   String? get processStateSummaryText {
     final s = processStateSummary;
     return s == null ? null : utf8.decode(s, allowMalformed: true);
@@ -351,6 +398,7 @@ sealed class MetricKitDiagnostic {
 
 /// MXCrashDiagnostic.
 final class CrashDiagnostic extends MetricKitDiagnostic {
+  /// Creates a crash diagnostic from its individual values.
   const CrashDiagnostic({
     required super.metadata,
     required super.callStackTree,
@@ -365,6 +413,8 @@ final class CrashDiagnostic extends MetricKitDiagnostic {
 
   /// Mach exception type, see [exceptionTypeName].
   final int? exceptionType;
+
+  /// Mach exception code.
   final int? exceptionCode;
 
   /// Darwin signal number, see [signalName].
@@ -400,6 +450,7 @@ final class CrashDiagnostic extends MetricKitDiagnostic {
 
 /// MXHangDiagnostic: the main thread did not respond to input.
 final class HangDiagnostic extends MetricKitDiagnostic {
+  /// Creates a hang diagnostic from its individual values.
   const HangDiagnostic({
     required super.metadata,
     required super.callStackTree,
@@ -407,6 +458,7 @@ final class HangDiagnostic extends MetricKitDiagnostic {
     required this.hangDuration,
   });
 
+  /// How long the main thread did not respond.
   final Duration hangDuration;
 
   @override
@@ -415,6 +467,7 @@ final class HangDiagnostic extends MetricKitDiagnostic {
 
 /// MXCPUExceptionDiagnostic: too much CPU time in a short period.
 final class CpuExceptionDiagnostic extends MetricKitDiagnostic {
+  /// Creates a CPU exception diagnostic from its individual values.
   const CpuExceptionDiagnostic({
     required super.metadata,
     required super.callStackTree,
@@ -423,7 +476,10 @@ final class CpuExceptionDiagnostic extends MetricKitDiagnostic {
     required this.totalSampledTime,
   });
 
+  /// CPU time the process used during [totalSampledTime].
   final Duration totalCpuTime;
+
+  /// The period over which the CPU usage was measured.
   final Duration totalSampledTime;
 
   @override
@@ -433,6 +489,7 @@ final class CpuExceptionDiagnostic extends MetricKitDiagnostic {
 
 /// MXDiskWriteExceptionDiagnostic: too much data written to disk.
 final class DiskWriteExceptionDiagnostic extends MetricKitDiagnostic {
+  /// Creates a disk write exception diagnostic from its individual values.
   const DiskWriteExceptionDiagnostic({
     required super.metadata,
     required super.callStackTree,
@@ -440,6 +497,7 @@ final class DiskWriteExceptionDiagnostic extends MetricKitDiagnostic {
     required this.totalWritesBytes,
   });
 
+  /// Bytes written to disk that caused the exception.
   final int totalWritesBytes;
 
   @override
@@ -449,6 +507,7 @@ final class DiskWriteExceptionDiagnostic extends MetricKitDiagnostic {
 
 /// MXAppLaunchDiagnostic: a slow launch (iOS 16+).
 final class AppLaunchDiagnostic extends MetricKitDiagnostic {
+  /// Creates a slow launch diagnostic from its individual values.
   const AppLaunchDiagnostic({
     required super.metadata,
     required super.callStackTree,
@@ -456,6 +515,7 @@ final class AppLaunchDiagnostic extends MetricKitDiagnostic {
     required this.launchDuration,
   });
 
+  /// How long the launch took.
   final Duration launchDuration;
 
   @override
@@ -465,6 +525,7 @@ final class AppLaunchDiagnostic extends MetricKitDiagnostic {
 /// One MXDiagnosticPayload: the diagnostics MetricKit delivered at once.
 @immutable
 class MetricKitDiagnosticReport {
+  /// Creates a report from its individual values.
   const MetricKitDiagnosticReport({
     required this.begin,
     required this.end,
@@ -555,17 +616,29 @@ class MetricKitDiagnosticReport {
     }
   }
 
-  /// MXDiagnosticPayload.timeStampBegin / timeStampEnd.
+  /// Start of the period the report covers
+  /// (MXDiagnosticPayload.timeStampBegin).
   final DateTime begin;
+
+  /// End of the period the report covers (MXDiagnosticPayload.timeStampEnd).
   final DateTime end;
 
   /// When the plugin stored the report.
   final DateTime receivedAt;
 
+  /// Crash diagnostics of the report.
   final List<CrashDiagnostic> crashes;
+
+  /// Hang diagnostics of the report.
   final List<HangDiagnostic> hangs;
+
+  /// CPU exception diagnostics of the report.
   final List<CpuExceptionDiagnostic> cpuExceptions;
+
+  /// Disk write exception diagnostics of the report.
   final List<DiskWriteExceptionDiagnostic> diskWriteExceptions;
+
+  /// Slow launch diagnostics of the report (iOS 16+).
   final List<AppLaunchDiagnostic> appLaunches;
 
   /// Sequence number the plugin gave the report when it stored it; grows
@@ -593,6 +666,7 @@ class MetricKitDiagnosticReport {
 /// assertion exits: those fields stay 0.
 @immutable
 class AppExitCounts {
+  /// Creates exit counts; unspecified counts are 0.
   const AppExitCounts({
     this.normal = 0,
     this.abnormal = 0,
@@ -606,6 +680,7 @@ class AppExitCounts {
     this.backgroundTaskAssertionTimeout = 0,
   });
 
+  /// Parses exit counts from a JSON map; absent counts become 0.
   factory AppExitCounts.fromJson(Map<String, Object?> json) {
     int c(String key) => _intOrNull(json[key]) ?? 0;
     return AppExitCounts(
@@ -665,8 +740,10 @@ class AppExitCounts {
       suspendedWithLockedFile +
       backgroundTaskAssertionTimeout;
 
+  /// All exits: [normal], [memoryPressure] and [problems].
   int get total => normal + memoryPressure + problems;
 
+  /// Converts the counts to a JSON map.
   Map<String, int> toJson() => {
     'normal': normal,
     'abnormal': abnormal,
@@ -685,6 +762,7 @@ class AppExitCounts {
 /// peak memory; [raw] has everything else (launch times, hang rate, ...).
 @immutable
 class MetricKitMetricReport {
+  /// Creates a report from its individual values.
   const MetricKitMetricReport({
     required this.begin,
     required this.end,
@@ -732,8 +810,13 @@ class MetricKitMetricReport {
     }
   }
 
+  /// Start of the period the report covers (MXMetricPayload.timeStampBegin).
   final DateTime begin;
+
+  /// End of the period the report covers (MXMetricPayload.timeStampEnd).
   final DateTime end;
+
+  /// When the plugin stored the report.
   final DateTime receivedAt;
 
   /// The latest app version in the period.
@@ -741,11 +824,17 @@ class MetricKitMetricReport {
 
   /// The period covers more than one app version.
   final bool multipleAppVersions;
+
+  /// Device and app details of the report, if any.
   final MetricKitMetadata? metadata;
 
   /// Null when the report has no exit metrics (before iOS 14).
   final AppExitCounts? foregroundExits;
+
+  /// Background exit counts; null when the report has no exit metrics.
   final AppExitCounts? backgroundExits;
+
+  /// Peak memory use of the app in bytes, if reported.
   final int? peakMemoryBytes;
 
   /// Sequence number the plugin gave the report when it stored it.

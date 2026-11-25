@@ -10,6 +10,8 @@ import 'support.dart';
 /// The platform layer behind `AndroidDiagnostics`. Replace
 /// [AndroidDiagnosticsPlatform.instance] with a fake in your own tests.
 abstract class AndroidDiagnosticsPlatform extends PlatformInterface {
+  /// Constructs the platform; subclasses must extend (not implement) this
+  /// class so the instance token can be verified.
   AndroidDiagnosticsPlatform() : super(token: _token);
 
   static final Object _token = Object();
@@ -19,50 +21,78 @@ abstract class AndroidDiagnosticsPlatform extends PlatformInterface {
       ? PigeonAndroidDiagnostics()
       : UnsupportedAndroidDiagnostics();
 
+  /// The implementation in use: [PigeonAndroidDiagnostics] on Android,
+  /// [UnsupportedAndroidDiagnostics] elsewhere.
   static AndroidDiagnosticsPlatform get instance => _instance;
 
+  /// Replaces the implementation, for example with a fake in tests.
   static set instance(AndroidDiagnosticsPlatform instance) {
     PlatformInterface.verify(instance, _token);
     _instance = instance;
   }
 
+  /// Reports which diagnostics features this device offers.
   Future<DiagnosticsSupport> getSupport();
 
+  /// Returns this app's historical process exit records, newest first.
+  ///
+  /// [pid] selects one process (0 = all); [maxNum] limits the count
+  /// (0 = all the system kept).
   Future<List<ExitInfo>> getExitReasons({
     required int pid,
     required int maxNum,
   });
 
+  /// Returns exit records newer than the previous call; the marker is
+  /// persisted across launches.
   Future<List<ExitInfo>> takeNewExitReasons();
 
+  /// Returns the raw trace bytes (ANR dump or tombstone) of [info], or null
+  /// when the system kept none.
   Future<Uint8List?> getTrace(ExitInfo info);
 
+  /// Stores [summary] to be reported in this process's future exit record;
+  /// returns false when unsupported or rejected.
   Future<bool> setProcessStateSummary(Uint8List? summary);
 
+  /// Runs a profiling [request] identified by [requestId] and completes
+  /// with its result.
   Future<ProfilingResult> requestProfiling(
     String requestId,
     ProfilingRequest request,
   );
 
+  /// Stops the running request [requestId] early; returns false when no
+  /// such request is pending.
   Future<bool> cancelProfiling(String requestId);
 
+  /// Registers system profiling [triggers] and returns the types this
+  /// device accepted.
   Future<List<ProfilingTriggerType>> addProfilingTriggers(
     List<ProfilingTrigger> triggers,
   );
 
+  /// Unregisters the triggers of the given [types].
   Future<void> removeProfilingTriggers(List<ProfilingTriggerType> types);
 
+  /// Unregisters all profiling triggers of this app.
   Future<void> clearProfilingTriggers();
 
+  /// Asks the system for a snapshot of the background system trace;
+  /// returns false when unsupported.
   Future<bool> requestRunningSystemTrace(String? tag);
 
+  /// Returns paths of the profile files the system delivered to the app.
   Future<List<String>> listProfilingFiles();
 
+  /// Every profiling result delivered to the app, requested or triggered.
   Stream<ProfilingResult> get profilingResults;
 }
 
 /// Talks to the Kotlin side through Pigeon.
 class PigeonAndroidDiagnostics extends AndroidDiagnosticsPlatform {
+  /// Creates the Pigeon implementation; [api] and [results] can be
+  /// overridden in tests.
   PigeonAndroidDiagnostics({
     AndroidDiagnosticsHostApi? api,
     Stream<ProfilingResultMessage>? results,
@@ -214,6 +244,7 @@ class UnsupportedAndroidDiagnostics extends AndroidDiagnosticsPlatform {
   Stream<ProfilingResult> get profilingResults => const Stream.empty();
 }
 
+/// Converts a Pigeon [ExitInfoMessage] to an [ExitInfo].
 @visibleForTesting
 ExitInfo exitInfoFromMessage(ExitInfoMessage m) {
   final anr = m.anrInfo;
@@ -240,6 +271,7 @@ ExitInfo exitInfoFromMessage(ExitInfoMessage m) {
   );
 }
 
+/// Converts a [ProfilingRequest] to its Pigeon message.
 @visibleForTesting
 ProfilingRequestMessage profilingRequestToMessage(ProfilingRequest r) =>
     ProfilingRequestMessage(
@@ -257,6 +289,7 @@ ProfilingRequestMessage profilingRequestToMessage(ProfilingRequest r) =>
       },
     );
 
+/// Converts a Pigeon [ProfilingResultMessage] to a [ProfilingResult].
 @visibleForTesting
 ProfilingResult profilingResultFromMessage(ProfilingResultMessage m) =>
     ProfilingResult(

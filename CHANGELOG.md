@@ -1,3 +1,13 @@
+## 0.1.2
+
+* Every public class, enum value, field, constructor and method now has API
+  docs (about 210 additions): exit reasons and process importance map to
+  their Android meaning, tombstone and MetricKit fields say where the value
+  comes from and what a missing value turns into, and the platform interfaces
+  describe each call.
+* The `public_member_api_docs` lint is on, so new public API must be
+  documented. No code changes.
+
 ## 0.1.1
 
 * Android: on Flutter 3.44+ apps no longer warn that app_diagnostics applies

@@ -140,10 +140,12 @@ abstract final class AndroidDiagnostics {
     List<ProfilingTrigger> triggers,
   ) => _platform.addProfilingTriggers(triggers);
 
+  /// Unregisters the triggers of the given [types].
   static Future<void> removeProfilingTriggers(
     List<ProfilingTriggerType> types,
   ) => _platform.removeProfilingTriggers(types);
 
+  /// Unregisters all profiling triggers of this app.
   static Future<void> clearProfilingTriggers() =>
       _platform.clearProfilingTriggers();
 

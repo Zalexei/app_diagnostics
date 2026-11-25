@@ -3,12 +3,25 @@ import 'dart:typed_data';
 
 /// CPU architecture of a tombstone (`Architecture` in tombstone.proto).
 enum TombstoneArch {
+  /// 32-bit ARM.
   arm32('arm'),
+
+  /// 64-bit ARM.
   arm64('arm64'),
+
+  /// 32-bit x86.
   x86('x86'),
+
+  /// 64-bit x86.
   x86_64('x86_64'),
+
+  /// 64-bit RISC-V.
   riscv64('riscv64'),
+
+  /// `NONE`: no architecture recorded.
   none('none'),
+
+  /// A value this plugin does not recognize.
   unknown('unknown');
 
   const TombstoneArch(this.abi);
@@ -16,12 +29,15 @@ enum TombstoneArch {
   /// The name debuggerd prints after `ABI:`.
   final String abi;
 
+  /// Maps the proto `Architecture` value to the enum; unrecognized values
+  /// map to [unknown].
   static TombstoneArch fromCode(int code) =>
       code >= 0 && code < unknown.index ? values[code] : unknown;
 }
 
 /// The fatal signal (`Signal` in tombstone.proto).
 class TombstoneSignal {
+  /// Creates a signal description.
   const TombstoneSignal({
     required this.number,
     required this.name,
@@ -34,23 +50,38 @@ class TombstoneSignal {
     required this.faultAddress,
   });
 
+  /// Signal number, e.g. 11 for `SIGSEGV`.
   final int number;
 
   /// e.g. `SIGSEGV`, `SIGABRT`.
   final String name;
+
+  /// Signal code (`si_code`).
   final int code;
 
   /// e.g. `SEGV_MAPERR`, `SI_TKILL`.
   final String codeName;
+
+  /// Whether the signal was sent by another process ([senderUid] and
+  /// [senderPid] are set).
   final bool hasSender;
+
+  /// UID of the process that sent the signal, if [hasSender].
   final int senderUid;
+
+  /// PID of the process that sent the signal, if [hasSender].
   final int senderPid;
+
+  /// Whether [faultAddress] is meaningful for this signal.
   final bool hasFaultAddress;
+
+  /// Faulting memory address, if [hasFaultAddress].
   final int faultAddress;
 }
 
 /// One stack frame (`BacktraceFrame` in tombstone.proto).
 class TombstoneFrame {
+  /// Creates a stack frame.
   const TombstoneFrame({
     required this.relPc,
     required this.pc,
@@ -65,12 +96,26 @@ class TombstoneFrame {
   /// PC relative to the start of the mapped file: feed it to `llvm-symbolizer`
   /// or `ndk-stack` together with [buildId].
   final int relPc;
+
+  /// Absolute program counter.
   final int pc;
+
+  /// Stack pointer.
   final int sp;
+
+  /// Symbol name of the function, empty if unknown.
   final String functionName;
+
+  /// Offset of [pc] from the start of [functionName].
   final int functionOffset;
+
+  /// Path of the mapped file (library or executable) containing the frame.
   final String fileName;
+
+  /// Offset of the mapping within [fileName].
   final int fileMapOffset;
+
+  /// Build ID of [fileName], empty if unknown.
   final String buildId;
 
   /// The frame as debuggerd prints it, without the `#NN` prefix.
@@ -88,6 +133,7 @@ class TombstoneFrame {
 
 /// One thread of the crashed process (`Thread` in tombstone.proto).
 class TombstoneThread {
+  /// Creates a thread entry.
   const TombstoneThread({
     required this.id,
     required this.name,
@@ -95,8 +141,13 @@ class TombstoneThread {
     required this.backtraceNote,
   });
 
+  /// Thread id.
   final int id;
+
+  /// Thread name.
   final String name;
+
+  /// Stack frames, innermost first.
   final List<TombstoneFrame> backtrace;
 
   /// Notes from the unwinder, e.g. why the backtrace is incomplete.
@@ -113,6 +164,8 @@ class TombstoneThread {
 /// bytes if you need them.
 /// Schema: https://android.googlesource.com/platform/system/core/+/refs/heads/main/debuggerd/proto/tombstone.proto
 class NativeTombstone {
+  /// Creates a tombstone from already decoded fields; see
+  /// [NativeTombstone.parse].
   const NativeTombstone({
     required this.arch,
     required this.buildFingerprint,
@@ -206,20 +259,37 @@ class NativeTombstone {
     );
   }
 
+  /// CPU architecture of the crashed process.
   final TombstoneArch arch;
+
+  /// `ro.build.fingerprint` of the device build.
   final String buildFingerprint;
+
+  /// Hardware revision (`ro.revision`).
   final String revision;
 
   /// Crash time as debuggerd formats it, e.g. `2026-10-31 12:00:00.123456789+0000`.
   final String timestamp;
+
+  /// Process id of the crashed process.
   final int pid;
 
   /// The thread that crashed.
   final int tid;
+
+  /// UID of the crashed process.
   final int uid;
+
+  /// SELinux context of the crashed process.
   final String selinuxLabel;
+
+  /// Command line arguments of the crashed process.
   final List<String> commandLine;
+
+  /// How long the process had been running when it crashed.
   final Duration processUptime;
+
+  /// The fatal signal, or null if the tombstone has none.
   final TombstoneSignal? signal;
 
   /// Message passed to `abort()` helpers such as `__android_log_assert`.

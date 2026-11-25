@@ -11,6 +11,8 @@ import 'profiling.dart';
 /// | [runningTraceSnapshot] | 16 QPR2 (API 36.1) |
 /// | [anrInfo] | 17 (API 37) |
 class DiagnosticsSupport {
+  /// Creates a support report; normally obtained from
+  /// `AndroidDiagnostics.getSupport`.
   const DiagnosticsSupport({
     required this.sdkInt,
     required this.sdkIntFull,
@@ -40,13 +42,27 @@ class DiagnosticsSupport {
   /// `Build.VERSION.SDK_INT_FULL` (major * 100000 + minor), or
   /// `sdkInt * 100000` before Android 16.
   final int sdkIntFull;
+
+  /// Whether `ApplicationExitInfo` exit reasons are available (Android 11+).
   final bool exitReasons;
+
+  /// Whether native crash tombstones can be read (Android 12+).
   final bool nativeTombstones;
+
+  /// Whether exit records carry extra ANR details (Android 17+).
   final bool anrInfo;
+
+  /// Whether ProfilingManager requests are available (Android 15+).
   final bool profiling;
+
+  /// Whether system profiling triggers can be registered (Android 16+).
   final bool profilingTriggers;
+
+  /// Whether a snapshot of the running system trace can be requested
+  /// (Android 16 QPR2+).
   final bool runningTraceSnapshot;
 
+  /// Whether this device can register a trigger of [type].
   bool supportsTrigger(ProfilingTriggerType type) =>
       profilingTriggers &&
       type != ProfilingTriggerType.none &&

@@ -14,6 +14,7 @@ enum ProfilingType {
 
   const ProfilingType(this.code);
 
+  /// The matching `ProfilingManager.PROFILING_TYPE_*` constant.
   final int code;
 }
 
@@ -29,6 +30,7 @@ enum BufferFillPolicy {
 /// A profiling request. Every parameter is optional; the system clamps values
 /// to its supported range and uses its defaults for omitted ones.
 class ProfilingRequest {
+  /// Requests a one-shot Java heap dump.
   const ProfilingRequest.javaHeapDump({this.tag, this.bufferSizeKb})
     : type = ProfilingType.javaHeapDump,
       duration = null,
@@ -37,6 +39,7 @@ class ProfilingRequest {
       trackJavaAllocations = null,
       bufferFillPolicy = null;
 
+  /// Requests a heap profile that samples allocations for [duration].
   const ProfilingRequest.heapProfile({
     this.tag,
     this.duration,
@@ -47,6 +50,7 @@ class ProfilingRequest {
        samplingFrequencyHz = null,
        bufferFillPolicy = null;
 
+  /// Requests CPU call stack sampling for [duration].
   const ProfilingRequest.stackSampling({
     this.tag,
     this.duration,
@@ -57,6 +61,7 @@ class ProfilingRequest {
        trackJavaAllocations = null,
        bufferFillPolicy = null;
 
+  /// Requests a Perfetto system trace for [duration].
   const ProfilingRequest.systemTrace({
     this.tag,
     this.duration,
@@ -67,38 +72,70 @@ class ProfilingRequest {
        samplingIntervalBytes = null,
        trackJavaAllocations = null;
 
+  /// The kind of profile this request records.
   final ProfilingType type;
 
   /// Lowercased (first 20 alphanumeric characters and dashes) into the file name.
   final String? tag;
+
+  /// How long to record; not used by [ProfilingRequest.javaHeapDump].
   final Duration? duration;
+
+  /// Size of the recording buffer in kilobytes.
   final int? bufferSizeKb;
+
+  /// Stack sampling: how many samples to take per second.
   final int? samplingFrequencyHz;
+
+  /// Heap profile: average number of allocated bytes between samples.
   final int? samplingIntervalBytes;
 
   /// Heap profile: track Java allocations instead of native ones.
   final bool? trackJavaAllocations;
+
+  /// System trace: what to do when the buffer fills up.
   final BufferFillPolicy? bufferFillPolicy;
 }
 
 /// `ProfilingResult.ERROR_*`, plus [unsupported] for devices without
 /// ProfilingManager (below Android 15).
 enum ProfilingError {
+  /// No error: the profile was recorded.
   none(0),
+
+  /// Denied by the system-wide rate limiter.
   rateLimitSystem(1),
+
+  /// Denied by the per-app rate limiter.
   rateLimitProcess(2),
+
+  /// Another profiling session is already running.
   profilingInProgress(3),
+
+  /// Profiling failed while it was running.
   failedExecuting(4),
+
+  /// The profile was recorded but post-processing it failed.
   failedPostProcessing(5),
+
+  /// Not enough disk space to store the result.
   noDiskSpace(6),
+
+  /// The request had invalid parameters.
   invalidRequest(7),
+
+  /// An unspecified error, or a code this plugin does not know.
   unknown(8),
+
+  /// ProfilingManager is not available on this device or platform.
   unsupported(-1);
 
   const ProfilingError(this.code);
 
+  /// The raw `ProfilingResult.ERROR_*` value, or -1 for [unsupported].
   final int code;
 
+  /// The error with [code], or [unknown] when no value matches.
   static ProfilingError fromCode(int code) {
     for (final error in values) {
       if (error.code == code) return error;
@@ -151,6 +188,7 @@ enum ProfilingTriggerType {
 
   const ProfilingTriggerType(this.code, this.minSdk, this.minSdkMinor);
 
+  /// The raw `ProfilingTrigger.TRIGGER_TYPE_*` value, or -1 for [unknown].
   final int code;
 
   /// Minimum `Build.VERSION.SDK_INT`.
@@ -162,6 +200,7 @@ enum ProfilingTriggerType {
   /// `Build.VERSION.SDK_INT_FULL` this trigger needs.
   int get minSdkFull => minSdk * 100000 + minSdkMinor;
 
+  /// The trigger type with [code], or [unknown] when no value matches.
   static ProfilingTriggerType fromCode(int code) {
     for (final type in values) {
       if (type.code == code) return type;
@@ -172,8 +211,10 @@ enum ProfilingTriggerType {
 
 /// A trigger to register with `addProfilingTriggers`.
 class ProfilingTrigger {
+  /// Creates a trigger of [type] with an optional per-trigger rate limit.
   const ProfilingTrigger(this.type, {this.rateLimitingPeriodHours});
 
+  /// The system event that captures the profile.
   final ProfilingTriggerType type;
 
   /// At most one result per this many hours for this trigger (the system
@@ -183,6 +224,7 @@ class ProfilingTrigger {
 
 /// Outcome of a profiling request or a trigger.
 class ProfilingResult {
+  /// Creates a result; normally built by the plugin from the platform's answer.
   const ProfilingResult({
     required this.errorCode,
     this.errorMessage,
@@ -193,21 +235,29 @@ class ProfilingResult {
 
   /// Raw `ProfilingResult.getErrorCode()`, -1 when unsupported.
   final int errorCode;
+
+  /// The system's description of the failure, if any.
   final String? errorMessage;
 
   /// Absolute path of the trace in the app's files dir when [isSuccess].
   /// Open it in https://ui.perfetto.dev.
   final String? filePath;
+
+  /// The tag of the request that produced this result.
   final String? tag;
 
   /// Raw `ProfilingResult.getTriggerType()`.
   final int triggerCode;
 
+  /// [errorCode] as a [ProfilingError].
   ProfilingError get error => ProfilingError.fromCode(errorCode);
 
+  /// [triggerCode] as a [ProfilingTriggerType]; [ProfilingTriggerType.none]
+  /// for results of a [ProfilingRequest].
   ProfilingTriggerType get trigger =>
       ProfilingTriggerType.fromCode(triggerCode);
 
+  /// Whether the profile was recorded and a [filePath] is available.
   bool get isSuccess => errorCode == 0 && filePath != null;
 
   @override
@@ -218,9 +268,13 @@ class ProfilingResult {
 
 /// A running profiling request.
 class ProfilingSession {
+  /// Creates a session; use `AndroidDiagnostics.startProfiling` instead.
   ProfilingSession(this.id, this.request, this.result, this._stop);
 
+  /// Unique identifier of this request within the app process.
   final String id;
+
+  /// The request this session was started with.
   final ProfilingRequest request;
 
   /// Completes when the system delivers the result (after [stop], the

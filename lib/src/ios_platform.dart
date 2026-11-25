@@ -8,6 +8,8 @@ import 'metrickit.dart';
 /// The platform layer behind `IosDiagnostics`. Replace
 /// [IosDiagnosticsPlatform.instance] with a fake in your own tests.
 abstract class IosDiagnosticsPlatform extends PlatformInterface {
+  /// Constructs the platform; subclasses must extend (not implement) this
+  /// class so the instance token can be verified.
   IosDiagnosticsPlatform() : super(token: _token);
 
   static final Object _token = Object();
@@ -17,13 +19,17 @@ abstract class IosDiagnosticsPlatform extends PlatformInterface {
       ? PigeonIosDiagnostics()
       : UnsupportedIosDiagnostics();
 
+  /// The implementation in use: [PigeonIosDiagnostics] on iOS,
+  /// [UnsupportedIosDiagnostics] elsewhere.
   static IosDiagnosticsPlatform get instance => _instance;
 
+  /// Replaces the implementation, for example with a fake in tests.
   static set instance(IosDiagnosticsPlatform instance) {
     PlatformInterface.verify(instance, _token);
     _instance = instance;
   }
 
+  /// Reports which MetricKit features this device offers.
   Future<MetricKitSupport> getSupport();
 
   /// Stored reports, newest first; with [onlyNew] only the ones no earlier
@@ -32,17 +38,25 @@ abstract class IosDiagnosticsPlatform extends PlatformInterface {
     required bool onlyNew,
   });
 
+  /// Stored daily metric reports, newest first; with [onlyNew] only the
+  /// ones no earlier call returned.
   Future<List<MetricKitMetricReport>> getMetricReports({required bool onlyNew});
 
+  /// Deletes all stored reports.
   Future<void> clearReports();
 
+  /// Stores [summary] to be attached to diagnostics MetricKit later reports
+  /// for this process (iOS 17+); null clears it.
   Future<bool> setProcessStateSummary(Uint8List? summary);
 
+  /// The kind of every report stored while this stream is listened to.
   Stream<MetricKitReportKind> get reportsArrived;
 }
 
 /// Talks to the Swift side through Pigeon.
 class PigeonIosDiagnostics extends IosDiagnosticsPlatform {
+  /// Creates the Pigeon implementation; [api] and [arrivals] can be
+  /// overridden in tests.
   PigeonIosDiagnostics({IosDiagnosticsHostApi? api, Stream<int>? arrivals})
     : _api = api ?? IosDiagnosticsHostApi(),
       _arrivals = arrivals;
